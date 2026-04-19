@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB Color Picker</title>
+    <link rel="icon" type="image/jpg" href="logo.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom animations and transitions */
+        .color-transition {
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .slider-thumb::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .slider-thumb::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: none;
+        }
+        
+        .preset-color {
+            transition: all 0.2s ease;
+        }
+        
+        .preset-color:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Clean up number inputs (removes default arrows) */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen color-transition flex items-center justify-center" id="body">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-12">
+            <header class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-palette mr-3 text-purple-600"></i>
+                    RGB Color Mixer
+                </h1>
+                <p class="text-gray-600 text-lg">Create your perfect background color</p>
+            </header>
+
+            <div class="mb-8">
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="w-32 h-32 rounded-xl shadow-lg border-4 border-white" id="colorPreview"></div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600 mb-2">Current Color</p>
+                        <p class="text-2xl font-mono font-bold text-gray-800" id="rgbDisplay">rgb(128, 128, 128)</p>
+                        <p class="text-lg font-mono text-gray-600" id="hexDisplay">#808080</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6 mb-8">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-lg font-semibold text-red-600 flex items-center">
+                            <i class="fas fa-circle mr-2"></i>Red
+                        </label>
+                        <input type="number" min="0" max="255" value="128" 
+                               class="w-16 text-center text-lg font-mono font-bold text-gray-800 bg-gray-100 border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all" 
+                               id="redValue">
+                    </div>
+                    <input type="range" min="0" max="255" value="128" 
+                           class="w-full h-3 bg-gradient-to-r from-black to-red-500 rounded-lg appearance-none cursor-pointer slider-thumb" 
+                           id="redSlider">
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-lg font-semibold text-green-600 flex items-center">
+                            <i class="fas fa-circle mr-2"></i>Green
+                        </label>
+                        <input type="number" min="0" max="255" value="128" 
+                               class="w-16 text-center text-lg font-mono font-bold text-gray-800 bg-gray-100 border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all" 
+                               id="greenValue">
+                    </div>
+                    <input type="range" min="0" max="255" value="128" 
+                           class="w-full h-3 bg-gradient-to-r from-black to-green-500 rounded-lg appearance-none cursor-pointer slider-thumb" 
+                           id="greenSlider">
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-lg font-semibold text-blue-600 flex items-center">
+                            <i class="fas fa-circle mr-2"></i>Blue
+                        </label>
+                        <input type="number" min="0" max="255" value="128" 
+                               class="w-16 text-center text-lg font-mono font-bold text-gray-800 bg-gray-100 border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" 
+                               id="blueValue">
+                    </div>
+                    <input type="range" min="0" max="255" value="128" 
+                           class="w-full h-3 bg-gradient-to-r from-black to-blue-500 rounded-lg appearance-none cursor-pointer slider-thumb" 
+                           id="blueSlider">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <button onclick="randomColor()" 
+                        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-random mr-2"></i>Random
+                </button>
+                <button onclick="copyColor()" 
+                        class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-copy mr-2"></i>Copy RGB
+                </button>
+                <button onclick="copyHex()" 
+                        class="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-hashtag mr-2"></i>Copy HEX
+                </button>
+                <button onclick="resetColor()" 
+                        class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-undo mr-2"></i>Reset
+                </button>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Preset Colors</h3>
+                <div class="grid grid-cols-6 md:grid-cols-10 gap-3">
+                    <button onclick="setPresetColor(255, 0, 0)" class="preset-color w-12 h-12 rounded-lg bg-red-500"></button>
+                    <button onclick="setPresetColor(255, 165, 0)" class="preset-color w-12 h-12 rounded-lg bg-orange-500"></button>
+                    <button onclick="setPresetColor(255, 255, 0)" class="preset-color w-12 h-12 rounded-lg bg-yellow-500"></button>
+                    <button onclick="setPresetColor(0, 255, 0)" class="preset-color w-12 h-12 rounded-lg bg-green-500"></button>
+                    <button onclick="setPresetColor(0, 255, 255)" class="preset-color w-12 h-12 rounded-lg bg-cyan-500"></button>
+                    <button onclick="setPresetColor(0, 0, 255)" class="preset-color w-12 h-12 rounded-lg bg-blue-500"></button>
+                    <button onclick="setPresetColor(128, 0, 128)" class="preset-color w-12 h-12 rounded-lg bg-purple-500"></button>
+                    <button onclick="setPresetColor(255, 0, 255)" class="preset-color w-12 h-12 rounded-lg bg-pink-500"></button>
+                    <button onclick="setPresetColor(255, 192, 203)" class="preset-color w-12 h-12 rounded-lg bg-pink-300"></button>
+                    <button onclick="setPresetColor(128, 128, 128)" class="preset-color w-12 h-12 rounded-lg bg-gray-500"></button>
+                    <button onclick="setPresetColor(0, 0, 0)" class="preset-color w-12 h-12 rounded-lg bg-black"></button>
+                    <button onclick="setPresetColor(255, 255, 255)" class="preset-color w-12 h-12 rounded-lg bg-white border-2 border-gray-300"></button>
+                </div>
+            </div>
+
+            <div id="notification" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 translate-y-24 opacity-0 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 pointer-events-none z-50">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span id="notificationText">Copied to clipboard!</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const body = document.getElementById('body');
+        const colorPreview = document.getElementById('colorPreview');
+        const rgbDisplay = document.getElementById('rgbDisplay');
+        const hexDisplay = document.getElementById('hexDisplay');
+        
+        const redSlider = document.getElementById('redSlider');
+        const greenSlider = document.getElementById('greenSlider');
+        const blueSlider = document.getElementById('blueSlider');
+        
+        const redValue = document.getElementById('redValue');
+        const greenValue = document.getElementById('greenValue');
+        const blueValue = document.getElementById('blueValue');
+        
+        let notificationTimeout;
+
+        // Initialize
+        updateColor();
+
+        // Slider event listeners
+        redSlider.addEventListener('input', updateColor);
+        greenSlider.addEventListener('input', updateColor);
+        blueSlider.addEventListener('input', updateColor);
+
+        // Number Input event listeners
+        [redValue, greenValue, blueValue].forEach(input => {
+            // Update as the user types
+            input.addEventListener('input', (e) => {
+                let val = parseInt(e.target.value);
+                
+                // Stop if they backspaced everything (wait for valid input)
+                if (isNaN(val)) return;
+
+                // Clamp values between 0 and 255
+                if (val < 0) val = 0;
+                if (val > 255) val = 255;
+
+                // Update the correct slider
+                if (e.target.id === 'redValue') redSlider.value = val;
+                if (e.target.id === 'greenValue') greenSlider.value = val;
+                if (e.target.id === 'blueValue') blueSlider.value = val;
+
+                updateColor();
+            });
+
+            // Cleanup formatting when they click away
+            input.addEventListener('blur', (e) => {
+                let val = parseInt(e.target.value);
+                
+                // If they left it blank, reset it to the current slider value
+                if (isNaN(val) || e.target.value === '') {
+                    if (e.target.id === 'redValue') e.target.value = redSlider.value;
+                    if (e.target.id === 'greenValue') e.target.value = greenSlider.value;
+                    if (e.target.id === 'blueValue') e.target.value = blueSlider.value;
+                } else {
+                    // Force the visually clamped value to show
+                    e.target.value = val < 0 ? 0 : (val > 255 ? 255 : val);
+                }
+            });
+        });
+
+        function updateColor() {
+            const r = redSlider.value;
+            const g = greenSlider.value;
+            const b = blueSlider.value;
+            
+            const rgbColor = `rgb(${r}, ${g}, ${b})`;
+            const hexColor = rgbToHex(r, g, b);
+            
+            // Update body background
+            body.style.backgroundColor = rgbColor;
+            
+            // Update preview
+            colorPreview.style.backgroundColor = rgbColor;
+            
+            // Update displays
+            rgbDisplay.textContent = rgbColor;
+            hexDisplay.textContent = hexColor;
+            
+            // Update value inputs (ONLY if the user isn't actively typing in them)
+            // This prevents the cursor from jumping to the end of the input box while typing
+            if (document.activeElement !== redValue) redValue.value = r;
+            if (document.activeElement !== greenValue) greenValue.value = g;
+            if (document.activeElement !== blueValue) blueValue.value = b;
+            
+            // Update slider backgrounds
+            redSlider.style.background = `linear-gradient(to right, rgb(0, ${g}, ${b}), rgb(255, ${g}, ${b}))`;
+            greenSlider.style.background = `linear-gradient(to right, rgb(${r}, 0, ${b}), rgb(${r}, 255, ${b}))`;
+            blueSlider.style.background = `linear-gradient(to right, rgb(${r}, ${g}, 0), rgb(${r}, ${g}, 255))`;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1);
+        }
+
+        function setPresetColor(r, g, b) {
+            redSlider.value = r;
+            greenSlider.value = g;
+            blueSlider.value = b;
+            updateColor();
+        }
+
+        function randomColor() {
+            redSlider.value = Math.floor(Math.random() * 256);
+            greenSlider.value = Math.floor(Math.random() * 256);
+            blueSlider.value = Math.floor(Math.random() * 256);
+            updateColor();
+            
+            // Add pulse animation to preview
+            colorPreview.classList.add('pulse-animation');
+            setTimeout(() => {
+                colorPreview.classList.remove('pulse-animation');
+            }, 2000);
+        }
+
+        // Universal Clipboard Function
+        function copyToClipboard(text, successMessage) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification(successMessage);
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(text, successMessage);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text, successMessage);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-99999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showNotification(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function copyColor() {
+            copyToClipboard(rgbDisplay.textContent, 'RGB color copied!');
+        }
+
+        function copyHex() {
+            copyToClipboard(hexDisplay.textContent, 'HEX color copied!');
+        }
+
+        function resetColor() {
+            redSlider.value = 128;
+            greenSlider.value = 128;
+            blueSlider.value = 128;
+            updateColor();
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+            }
+            
+            notification.classList.remove('translate-y-24', 'opacity-0');
+            notification.classList.add('translate-y-0', 'opacity-100');
+            
+            notificationTimeout = setTimeout(() => {
+                notification.classList.remove('translate-y-0', 'opacity-100');
+                notification.classList.add('translate-y-24', 'opacity-0');
+            }, 2000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Prevent shortcuts from triggering if the user is typing in the number inputs
+            if (e.target.tagName.toLowerCase() === 'input') return;
+
+            if (e.key === 'r' || e.key === 'R') {
+                randomColor();
+            } else if (e.key === 'c' || e.key === 'C') {
+                copyColor();
+            } else if (e.key === 'h' || e.key === 'H') {
+                copyHex();
+            } else if (e.key === 'Escape') {
+                resetColor();
+            }
+        });
+    </script>
+</body>
+</html>
