@@ -1,3 +1,4 @@
+<!--FIX BUGS 🐛 ON YOUR OWN-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +53,6 @@
             animation: pulse 2s infinite;
         }
 
-        /* Clean up number inputs (removes default arrows) */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -204,7 +204,7 @@
             input.addEventListener('input', (e) => {
                 let val = parseInt(e.target.value);
                 
-                // Stop if they backspaced everything (wait for valid input)
+                // Stop if they backspaced everything
                 if (isNaN(val)) return;
 
                 // Clamp values between 0 and 255
@@ -219,7 +219,7 @@
                 updateColor();
             });
 
-            // Cleanup formatting when they click away
+            // Cleanup formatting bored :)
             input.addEventListener('blur', (e) => {
                 let val = parseInt(e.target.value);
                 
@@ -253,8 +253,6 @@
             rgbDisplay.textContent = rgbColor;
             hexDisplay.textContent = hexColor;
             
-            // Update value inputs (ONLY if the user isn't actively typing in them)
-            // This prevents the cursor from jumping to the end of the input box while typing
             if (document.activeElement !== redValue) redValue.value = r;
             if (document.activeElement !== greenValue) greenValue.value = g;
             if (document.activeElement !== blueValue) blueValue.value = b;
@@ -289,7 +287,7 @@
             }, 2000);
         }
 
-        // Universal Clipboard Function
+        // Copied to Clipboard thingy
         function copyToClipboard(text, successMessage) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
