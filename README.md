@@ -30,5 +30,5 @@ Since this is a client-side application, no installation is required to use it. 
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/MRXXXGMRYT/RGB-COLOR-PICKER.git](https://github.com/MRXXXGMRYT/RGB-COLOR-PICKER.git)
+   git clone https://github.com/MRXXXGMRYT/RGB-COLOR-PICKER.git
    
